@@ -409,7 +409,7 @@ DimPlot(this_combined, reduction = "umap", label = T, label.box = T)
 
 ```
 
-```{r, fig.width=10, fig.height = 10}
+```{r, fig.width=10, fig.height = 8}
 
 FeaturePlot(
   this_combined,
