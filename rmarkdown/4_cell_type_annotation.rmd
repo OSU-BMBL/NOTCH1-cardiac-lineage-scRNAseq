@@ -424,6 +424,24 @@ FeaturePlot(
 ```
 
 
+```{r, fig.width=10, fig.height = 6}
+#, fig.width=10, fig.height = 10
+
+# Pericyte: CALD1
+
+FeaturePlot(
+  this_combined,
+  features = c("CALD1","MEF2C","SOX10","MIXL1","EOMES","MESP1"),
+  ncol = 3,
+  keep.scale = NULL,
+  pt.size = 0.6,
+  cols = two_color
+)
+
+
+```
+
+
 ```{r, fig.height=6}
 
 deg_filename <- paste0("../sample_obj/", this_sample_name, "_marker.csv")
@@ -820,6 +838,8 @@ tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(15)] <- "Vascular smooth muscle cells"
 tmp_levels[c(1, 7, 9, 12, 13)] <- "Cardiac fibroblast"
+tmp_levels[c(1, 7, 9, 12, 13)] <- "SHF progenitor"
+tmp_levels[c(1, 7, 9, 12, 13)] <- "FHF progenitor"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -1191,6 +1211,25 @@ DimPlot(combined,
         cols = custom_color,
         pt.size = 0.8)
 
+p1 <- DimPlot(
+  combined,
+  reduction = "umap",
+  split.by = "orig.ident",
+  cols = custom_color,
+  pt.size = 0.8,
+  ncol = 6
+)
+
+
+png(
+  paste("umap_12.png",
+        sep = ""),
+  width = 6000,
+  height = 1800,
+  res = 300
+)
+print(p1)
+dev.off()
 ```
 
 ```{r,,eval=F,message=F,warning=F,error=F}
