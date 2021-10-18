@@ -248,7 +248,7 @@ DimPlot(this_combined, reduction = "umap", label = T, label.box = T)
 
 ```
 
-```{r, fig.height = 10}
+```{r, fig.height = 6, fig.width=10}
 
 FeaturePlot(
   this_combined,
@@ -268,7 +268,7 @@ FeaturePlot(
 
 tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Mesoderm", 19)
-tmp_levels[c(8, 11, 14, 16, 19)] <- "iPSCs"
+tmp_levels[c(8, 11, 14, 16, 17, 19)] <- "iPSCs"
 tmp_levels[c(7, 15)] <- "Cardiac mesoderm"
 
 levels(tmp_ident) <- tmp_levels
@@ -328,7 +328,7 @@ DimPlot(this_combined, reduction = "umap", label = T, label.box = T)
 
 ```
 
-```{r, fig.height = 6}
+```{r, fig.height = 6, fig.width = 10}
 
 FeaturePlot(
   this_combined,
@@ -350,7 +350,7 @@ tmp_ident <- as.factor(this_combined$seurat_clusters)
 
 tmp_levels <- rep("Mesoderm", 4)
 tmp_levels[c(4)] <- "iPSCs"
-tmp_levels[c(1, 3)] <- "Cardiac mesoderm"
+#tmp_levels[c(3)] <- "Cardiac mesoderm"
 
 levels(tmp_ident) <- tmp_levels
 
@@ -444,8 +444,6 @@ tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Cardiac mesoderm", length(levels(tmp_ident)))
 tmp_levels[c(3, 6, 8, 9)] <- "Differentiating iPSCs"
 tmp_levels[c(4)] <- "SHF progenitor"
-tmp_levels[c(2)] <- "Unknown"
-
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -630,7 +628,7 @@ tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(9, 11, 14)] <- "FHF progenitor"
 tmp_levels[c(3, 5)] <- "SHF progenitor"
 tmp_levels[c(6)] <- "Epicardial progenitor"
-tmp_levels[c(1, 7, 8, 12, 13)] <- "Unknown"
+tmp_levels[c(1, 7, 8, 12, 13)] <- "Unidentified"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -824,7 +822,7 @@ tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(15)] <- "Vascular smooth muscle cells"
 tmp_levels[c(1, 7, 9)] <- "Cardiac fibroblast"
-tmp_levels[c(3, 5, 8, 10, 11, 13 )] <- "Unknown"
+tmp_levels[c(3, 8, 13 )] <- "Unidentified"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -1115,7 +1113,7 @@ tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Atrial cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(8, 12, 13, 14)] <- "Ventricular cardiomyocytes"
 tmp_levels[c(11)] <- "Pacemaker cell"
-tmp_levels[c(2, 6)] <- "Cardiac fibroblast"
+tmp_levels[c(2)] <- "Cardiac fibroblast"
 tmp_levels[c(10)] <- "Vascular smooth muscle cells"
 
 levels(tmp_ident) <- tmp_levels
@@ -1147,7 +1145,7 @@ VlnPlot(this_combined, features = unique(this_markers), ncol = 3)
 
 # UMAP of cell types using all samples
   
-```{r eval=F, fig.width=10, fig.height=8}
+```{r eval=T, fig.width=10, fig.height=6}
 obj1 <- qread("../sample_obj/Con0.qsave")
 obj2 <- qread("../sample_obj/Con2.qsave")
 obj3 <- qread("../sample_obj/Con5.qsave")
@@ -1179,8 +1177,6 @@ obj <-
   )
 
 combined <- AddMetaData(combined, obj$cell_type, col.name = "cell_type")
-Idents(combined) <- combined$cell_type
-DimPlot(combined, reduction = "umap", cols = custom_color)
 
 tmp_ident <- as.factor(combined$orig.ident)
 levels(tmp_ident) <- c(rep("Con",6), rep("KO",6))
@@ -1189,7 +1185,7 @@ combined <- AddMetaData(combined, tmp_ident, col.name = "condition")
 ```
 
 
-```{r fig.width=10, fig.height=8}
+```{r fig.width=10, fig.height=6}
 
 
 Idents(combined) <- combined$cell_type
@@ -1248,7 +1244,8 @@ DimPlot(combined, reduction = "umap", cols = custom_color)
 
 ```
 
-```{r,,eval=F,message=F,warning=F,error=F}
+
+```{r,,eval=F,message=T,warning=F,error=F}
 qs::qsave(combined,'combined.qsave')
 ```
 
