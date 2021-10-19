@@ -1249,7 +1249,3 @@ DimPlot(combined, reduction = "umap", cols = custom_color)
 qs::qsave(combined,'combined.qsave')
 ```
 
-
-```{r,,eval=T,message=F,warning=F,error=F}
-
-```
