@@ -1,5 +1,5 @@
 ---
-title: "Cell type annotation"
+title: "Trajectory inference"
 author: "Cankun Wang"
 date: "`r format(Sys.time(), '%m/%d/%Y')`"
 output: 
@@ -58,9 +58,6 @@ custom_color <-
 
 two_color <- c('#C0C0C0', '#B00D23')
 
-provided_marker <- read.csv("provided_marker_manual.csv", header = T)
-provided_marker$cell_type <- as.factor(provided_marker$cell_type)
-
 Idents(combined) <- combined$orig.ident
 DefaultAssay(combined) <- "RNA"
 
@@ -86,6 +83,54 @@ dbs <-
 
 
 # Trajectory
+
+
+```{r,echo=F,eval=T,message=FALSE,warning=F}
+dir.create('../result')
+dir.create('../result/trajectory')
+
+this_sample_name <- "Con14"
+
+for (this_sample_name in levels(combined$orig.ident)) {
+  this_combined <-
+    qs::qread(paste0("../sample_obj/", this_sample_name, ".qsave"))
+  Idents(this_combined) <- this_combined$cell_type
+  #this_combined <- FindVariableFeatures(this_combined)
+  combined.cds <- as.cell_data_set(this_combined)
+  combined.cds <-
+    cluster_cells(cds = combined.cds, reduction_method = "UMAP")
+  
+  combined.cds <- learn_graph(combined.cds, use_partition = TRUE)
+  hsc <- colnames(this_combined)
+  
+  rowData(combined.cds)$gene_short_name <-
+    rownames(rowData(combined.cds))
+  
+  p1 <- plot_cells(
+    combined.cds,
+    show_trajectory_graph = T,
+    group_label_size = 0,
+    color_cells_by = "cell_type",
+    group_cells_by = "partition",
+    label_groups_by_cluster = F,
+    graph_label_size = 2.5,
+    label_branch_points = F,
+    label_roots = F,
+    label_leaves = T,
+    label_cell_groups = F,
+    cell_size = 0.6,
+  ) + scale_color_manual(values = custom_color)
+  png(
+    paste0("../result/trajectory/", this_sample_name, ".png"),
+    width = 1800,
+    height = 1500,
+    res = 300
+  )
+  print(p1)
+  dev.off()
+  
+}
+```
 
 
 ```{r,echo=F,eval=F,message=FALSE,warning=F}

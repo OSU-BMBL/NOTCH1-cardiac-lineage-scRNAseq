@@ -1145,7 +1145,7 @@ VlnPlot(this_combined, features = unique(this_markers), ncol = 3)
 
 # UMAP of cell types using all samples
   
-```{r eval=T, fig.width=10, fig.height=6}
+```{r, eval=T, fig.width=10, fig.height=6}
 obj1 <- qread("../sample_obj/Con0.qsave")
 obj2 <- qread("../sample_obj/Con2.qsave")
 obj3 <- qread("../sample_obj/Con5.qsave")
@@ -1224,7 +1224,7 @@ p1 <- DimPlot(
   reduction = "umap",
   split.by = "condition",
   cols = custom_color,
-  pt.size = 0.6,
+  pt.size = 0.8,
   ncol = 6
 )
 
@@ -1245,7 +1245,7 @@ DimPlot(combined, reduction = "umap", cols = custom_color)
 ```
 
 
-```{r,,eval=F,message=T,warning=F,error=F}
+```{r,eval=T,message=T,warning=F,error=F}
 qs::qsave(combined,'combined.qsave')
 ```
 
