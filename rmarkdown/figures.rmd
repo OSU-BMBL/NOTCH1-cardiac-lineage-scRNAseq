@@ -1,0 +1,391 @@
+---
+title: "Figures"
+author: "Cankun Wang"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(error = F)
+knitr::opts_chunk$set(fig.width = 8)
+
+library(Seurat)
+library(cowplot)
+library(ggplot2)
+library(patchwork)
+library(here)
+library(qs)
+library(Polychrome)
+library(RColorBrewer)
+library(tidyverse)
+
+```
+
+
+# Set working dir
+
+```{r,,eval=T,message=F,warning=F,error=F}
+here::i_am("4_cell_type_annotation.Rmd")
+here::set_here()
+print(paste("Current working directory:", here::here()))
+
+```
+
+# Load data
+
+```{r}
+source("functions.R")
+dir.create('../sample_obj', showWarnings = F)
+combined <- qs::qread('combined.qsave')
+
+DefaultAssay(combined) <- "RNA"
+Idents(combined) <- combined$orig.ident
+
+custom_color <-
+  as.character(palette36.colors(36)[-2])
+two_color <- c('#C0C0C0', '#B00D23')
+
+provided_marker <- read_csv("../marker/marker_by_day.csv") %>%
+  mutate(cell_type = factor(cell_type))
+
+provided_marker
+```
+
+
+```{r, fig.width=10, fig.height=8}
+
+p1 <- DimPlot(
+  combined,
+  reduction = "umap",
+  cols = custom_color,
+  label = T,
+  pt.size = 0.2,
+  repel = T,
+  label.box = T
+) + coord_fixed(1)
+
+pdf("umap_sample.pdf",width = 6, height = 5)
+print(p1)
+dev.off()
+
+
+p1 <- DimPlot(
+  combined,
+  group.by = "cell_type",
+  reduction = "umap",
+  cols = custom_color,
+  label = F,
+  pt.size = 0.12,
+  repel = T,
+  label.box = F
+) + coord_fixed(1)
+
+pdf("umap_cell_type.pdf",width = 10, height = 5)
+print(p1)
+dev.off()
+
+```
+
+# Con10
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_con10.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_con10.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+  
+```
+
+
+# N1KO10
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_N1KO10.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_N1KO10.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+  
+```
+
+
+# Con14
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_con14.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_con14.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+Idents(combined) <- combined$cell_type
+
+
+p3 <-
+  FeaturePlot(
+    this_combined,
+    features = c("TNNT2","DDR2"),
+    ncol = 2,
+    keep.scale = NULL,
+    pt.size = 0.4,
+    cols = two_color
+  ) + coord_fixed(1)
+
+pdf("feature_con14.pdf", width = 10, height = 6)
+
+print(p3)
+dev.off()
+
+```
+
+
+# N1KO14
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_N1KO14.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_N1KO14.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+Idents(combined) <- combined$cell_type
+
+
+p3 <-
+  FeaturePlot(
+    this_combined,
+    features = c("TNNT2","DDR2"),
+    ncol = 2,
+    keep.scale = NULL,
+    pt.size = 0.4,
+    cols = two_color
+  ) + coord_fixed(1)
+
+pdf("feature_N1KO14.pdf", width = 10, height = 6)
+
+print(p3)
+dev.off()
+
+```
+
+
+# Con30
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_Con30.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_Con30.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+Idents(combined) <- combined$cell_type
+
+
+p3 <-
+  FeaturePlot(
+    this_combined,
+    features = c("TNNT2","MYL2"),
+    ncol = 2,
+    keep.scale = NULL,
+    pt.size = 0.4,
+    cols = two_color
+  ) + coord_fixed(1)
+
+pdf("feature_Con30.pdf", width = 10, height = 6)
+
+print(p3)
+dev.off()
+
+```
+
+
+# N1KO30
+
+```{r}
+
+Idents(this_combined) <- this_combined$cell_type
+p2 <-
+  DimPlot(
+    this_combined,
+    reduction = "umap",
+    cols = custom_color,
+    pt.size = 0.2
+  ) + coord_fixed(1)
+
+pdf("umap_N1KO30.pdf", width = 6, height = 5)
+print(p2)
+dev.off()
+
+
+pie_df <- table(as.factor(this_combined$cell_type))
+pct <- round(100 * pie_df / sum(pie_df))
+
+pdf("pie_N1KO30.pdf", width = 8, height = 5)
+print(pie(
+  pie_df,
+  labels = paste( sep = " ", pct, "%"),
+  col = custom_color
+))
+dev.off()
+
+Idents(combined) <- combined$cell_type
+
+
+p3 <-
+  FeaturePlot(
+    this_combined,
+    features = c("TNNT2","MYL2"),
+    ncol = 2,
+    keep.scale = NULL,
+    pt.size = 0.4,
+    cols = two_color
+  ) + coord_fixed(1)
+
+pdf("feature_N1KO30.pdf", width = 10, height = 6)
+
+print(p3)
+dev.off()
+
+```
+
+
+
+
+```{r fig.width=10, fig.height=8}
+Idents(combined) <- combined$cell_type
+
+
+p3 <-
+  FeaturePlot(
+    this_combined,
+    features = c("TNNT2","DDR2"),
+    ncol = 2,
+    keep.scale = NULL,
+    pt.size = 0.4,
+    cols = two_color
+  ) + coord_fixed(1)
+
+pdf("feature_con14.pdf", width = 10, height = 6)
+
+print(p3)
+dev.off()
+
+```
+
+
+```{r,eval=T,message=T,warning=F,error=F}
+qs::qsave(combined,'combined.qsave')
+```
+
