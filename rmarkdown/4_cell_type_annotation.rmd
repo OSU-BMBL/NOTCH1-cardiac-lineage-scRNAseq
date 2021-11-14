@@ -139,7 +139,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
 ```
   
 
@@ -208,7 +208,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
 ```
 
 
@@ -260,6 +260,8 @@ FeaturePlot(
 )
 #VlnPlot(this_combined, features = this_markers, ncol = 3)
 
+
+
 ```
 
 
@@ -290,7 +292,9 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("MIXL1"))
+print_violin(this_sample_name, genes = c("MIXL1"))
 ```
   
 
@@ -370,7 +374,9 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("MIXL1"))
+print_violin(this_sample_name, genes = c("MIXL1"))
 ```
 
 
@@ -456,6 +462,9 @@ DimPlot(this_combined, reduction = "umap")
 # Save
 qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("ISL1"))
+print_violin(this_sample_name, genes = c("ISL1"))
 ```
 
 ```{r, fig.width=10, fig.height = 12}
@@ -547,6 +556,10 @@ DimPlot(this_combined, reduction = "umap")
 # Save
 qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("ISL1"))
+
+print_violin(this_sample_name, genes = c("ISL1"))
 ```
 
 ```{r, fig.width=10, fig.height = 12}
@@ -644,7 +657,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 #Con10
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -742,7 +755,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 #N1KO10
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -836,7 +849,8 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("TNNT2", "DDR2"))
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -934,7 +948,8 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("TNNT2", "DDR2"))
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -1034,7 +1049,8 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("TNNT2", "MYL2"))
 ```
 
 ```{r, fig.width=10, fig.height = 16}
@@ -1132,8 +1148,8 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-
-
+print_sample(this_sample_name)
+print_genes(this_sample_name, genes = c("TNNT2", "MYL2"))
 ```
 
 ```{r, fig.width=10, fig.height = 20}

@@ -41,8 +41,7 @@ print(paste("Current working directory:", here::here()))
 
 ```{r,echo=F,eval=T,message=F,warning=F,error=F}
 
-combined <- qs::qread('combined_qc.qsave')
-
+combined <- qs::qread('combined.qsave')
 ```
 
 # Integration
@@ -50,6 +49,7 @@ combined <- qs::qread('combined_qc.qsave')
 ```{r,echo=F,eval=T,message=F,warning=F,error=F}
 
 combine.list <- SplitObject(combined, split.by = "orig.ident")
+
 combine.list <- lapply(
   X = combine.list,
   FUN = function(x) {
@@ -58,9 +58,6 @@ combine.list <- lapply(
       FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)
   }
 )
-combine.anchors <-
-  FindIntegrationAnchors(object.list = combine.list, dims = 1:30)
-combined <- IntegrateData(anchorset = combine.anchors, dims = 1:30)
 
 
 ```
@@ -68,24 +65,72 @@ combined <- IntegrateData(anchorset = combine.anchors, dims = 1:30)
 # Dimension reduction
 
 ```{r,echo=F,eval=T,message=F,warning=F,error=F}
+days <- c("0", "2", "5", "10", "14", "30")
 
-DefaultAssay(combined) <- "integrated"
-combined <- ScaleData(combined, verbose = FALSE)
-combined <- RunPCA(combined, npcs = 30, verbose = FALSE)
-combined <- RunUMAP(combined, reduction = "pca", dims = 1:30, n.components = 3L)
-combined <- RunTSNE(combined, reduction = "pca", dims = 1:30, n.components = 3L)
-combined <- FindNeighbors(combined, reduction = "pca", dims = 1:30)
-combined <- FindClusters(combined, resolution = 0.2)
-
+i = 30
+for(i in days) {
+  this_days <- c(paste0("Con", i), paste0("N1KO", i))
+  sample_idx <- which(names(combine.list) %in% this_days)
+  sub_list <- combine.list[sample_idx]
+  combine.anchors <-
+    FindIntegrationAnchors(object.list = sub_list, dims = 1:20)
+  sub_combined <-
+    IntegrateData(anchorset = combine.anchors, dims = 1:20)
+  DefaultAssay(sub_combined) <- "integrated"
+  sub_combined <- ScaleData(sub_combined, verbose = FALSE)
+  sub_combined <- RunPCA(sub_combined, npcs = 20, verbose = FALSE)
+  sub_combined <-
+    RunUMAP(sub_combined, reduction = "pca", dims = 1:20)
+  sub_combined <-
+    FindNeighbors(sub_combined, reduction = "pca", dims = 1:20)
+  sub_combined <- FindClusters(sub_combined, resolution = 0.2)
+  
+  Idents(combined) <- combined$orig.ident
+  this_combind <- subset(combined, idents = this_days)
+  sub_combined <-
+    AddMetaData(sub_combined, this_combind$cell_type, col.name = "cell_type")
+  qs::qsave(sub_combined, paste0("../integration/day", i, ".qsave"))
+}
 
 ```
 
 
 
-```{r,echo=F,eval=F,message=F,warning=F,error=F}
+```{r,echo=F,eval=F,message=F,warning=F,error=F, fig.width=10}
+sub_combined <- qs::qread("../integration/day14.qsave")
+DimPlot(
+  sub_combined,
+  reduction = "umap",
+  cols = as.vector(palette36.colors(36)[-2]),
+  label = T
+)
 
-DimPlot(combined, reduction = "umap", cols = as.vector(palette36.colors(36)[-2]),label = T)
+DimPlot(
+  sub_combined,
+  reduction = "umap",
+  group.by = "orig.ident",
+  cols = as.vector(palette36.colors(36)[-2]),
+  label = T
+)
 
+DimPlot(
+  sub_combined,
+  reduction = "umap",
+  group.by = "cell_type",
+  cols = as.vector(palette36.colors(36)[-2]),
+  label = T
+)
+
+DimPlot(
+  sub_combined,
+  reduction = "umap",
+  group.by = "cell_type",
+  split.by = "orig.ident",
+  cols = as.vector(palette36.colors(36)[-2]),
+  label = T
+)
+
+FeaturePlot(sub_combined)
 
 ```
 

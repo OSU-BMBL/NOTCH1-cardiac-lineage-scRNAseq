@@ -95,118 +95,97 @@ dev.off()
 
 ```
 
-# Con10
+# Con2
 
 ```{r}
-
-Idents(this_combined) <- this_combined$cell_type
-p2 <-
-  DimPlot(
-    this_combined,
-    reduction = "umap",
-    cols = custom_color,
-    pt.size = 0.2
-  ) + coord_fixed(1)
-
-pdf("umap_con10.pdf", width = 6, height = 5)
-print(p2)
-dev.off()
-
-
-pie_df <- table(as.factor(this_combined$cell_type))
-pct <- round(100 * pie_df / sum(pie_df))
-
-pdf("pie_con10.pdf", width = 8, height = 5)
-print(pie(
-  pie_df,
-  labels = paste( sep = " ", pct, "%"),
-  col = custom_color
-))
-dev.off()
-
+all_ct <- levels(as.factor(combined$cell_type))
+all_cols <- custom_color[1:length(all_ct)]
+names(all_cols) <- all_ct
+print_sample <- function(this_sample_name = "Con2") {
+  Idents(this_combined) <- this_combined$cell_type
   
+  this_cols <- all_cols[as.character(unique(this_combined$cell_type))]
+  
+  p2 <-
+    DimPlot(
+      this_combined,
+      reduction = "umap",
+      cols = this_cols,
+      pt.size = 0.2
+    ) + coord_fixed(1)
+  
+  pdf(paste0("umap_",this_sample_name,".pdf"), width = 6, height = 5)
+  print(p2)
+  dev.off()
+  
+  
+  pie_df <- table(as.factor(this_combined$cell_type))
+  pct <- round(100 * pie_df / sum(pie_df))
+  
+  pdf(paste0("pie_",this_sample_name,".pdf"), width = 8, height = 5)
+  print(pie(pie_df,
+            labels = paste(sep = " ", pct, "%"),
+            col = this_cols))
+  dev.off()
+}
+
+print_genes <-
+  function(this_sample_name,
+           genes = c("TNNT2", "DDR2"),
+           width = 10,
+           height = 6) {
+    p1 <-
+      FeaturePlot(
+        this_combined,
+        features = genes,
+        ncol = 2,
+        keep.scale = NULL,
+        pt.size = 0.4,
+        cols = two_color
+      ) + coord_fixed(1)
+    
+    
+    pdf(paste0("genes_", this_sample_name, ".pdf"),
+        width = width,
+        height = height)
+    
+    print(p1)
+    dev.off()
+  }
+
+print_violin <-
+  function(this_sample_name,
+           genes = c("MIXL1"),
+           width = 8,
+           height = 6) {
+    this_cols <- all_cols[as.character(unique(this_combined$cell_type))]
+    p1 <-
+      VlnPlot(
+        this_combined,
+        features = genes,
+        ncol = 1,
+        pt.size = 0.4,
+        cols = this_cols
+      ) + coord_fixed(0.6)
+    
+    
+    pdf(paste0("violin_", this_sample_name, ".pdf"),
+        width = width,
+        height = height)
+    
+    print(p1)
+    dev.off()
+  }
 ```
 
 
-# N1KO10
+# Gene plots
 
 ```{r}
 
-Idents(this_combined) <- this_combined$cell_type
-p2 <-
-  DimPlot(
-    this_combined,
-    reduction = "umap",
-    cols = custom_color,
-    pt.size = 0.2
-  ) + coord_fixed(1)
-
-pdf("umap_N1KO10.pdf", width = 6, height = 5)
-print(p2)
-dev.off()
 
 
-pie_df <- table(as.factor(this_combined$cell_type))
-pct <- round(100 * pie_df / sum(pie_df))
 
-pdf("pie_N1KO10.pdf", width = 8, height = 5)
-print(pie(
-  pie_df,
-  labels = paste( sep = " ", pct, "%"),
-  col = custom_color
-))
-dev.off()
-
-  
-```
-
-
-# Con14
-
-```{r}
-
-Idents(this_combined) <- this_combined$cell_type
-p2 <-
-  DimPlot(
-    this_combined,
-    reduction = "umap",
-    cols = custom_color,
-    pt.size = 0.2
-  ) + coord_fixed(1)
-
-pdf("umap_con14.pdf", width = 6, height = 5)
-print(p2)
-dev.off()
-
-
-pie_df <- table(as.factor(this_combined$cell_type))
-pct <- round(100 * pie_df / sum(pie_df))
-
-pdf("pie_con14.pdf", width = 8, height = 5)
-print(pie(
-  pie_df,
-  labels = paste( sep = " ", pct, "%"),
-  col = custom_color
-))
-dev.off()
-
-Idents(combined) <- combined$cell_type
-
-
-p3 <-
-  FeaturePlot(
-    this_combined,
-    features = c("TNNT2","DDR2"),
-    ncol = 2,
-    keep.scale = NULL,
-    pt.size = 0.4,
-    cols = two_color
-  ) + coord_fixed(1)
-
-pdf("feature_con14.pdf", width = 10, height = 6)
-
-print(p3)
-dev.off()
 
 ```
 

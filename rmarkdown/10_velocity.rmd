@@ -64,7 +64,7 @@ sample_list
 
 
 ```{r}
-i = 11
+i = 1
 for (i in seq_len(nrow(sample_list))) {
   this_sample <- sample_list$sample[i]
   this_sample_name <- sample_list$id[i]
@@ -101,8 +101,7 @@ for (i in seq_len(nrow(sample_list))) {
   
   bm[["RNA"]] <- bm[["spliced"]]
   #DefaultAssay(bm) <- "RNA"
-  bm <- NormalizeData(bm)
-  bm <- FindVariableFeatures(bm)
+  bm <- SCTransform(bm)
   bm <- ScaleData(bm)
   bm <- RunPCA(bm)
   bm <- RunUMAP(bm, dims = 1:20)
