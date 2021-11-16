@@ -1,5 +1,6 @@
 
-Gene-cell expression count matrix generated from CellRanger workflow
+Gene-cell expression count matrix generated from CellRanger workflow. Not uploaded to GitHub due to file size limit.
+
 
 ```
 ├── [4.0K]  Con0_CKDL200167803-1a-SI_GA_D3_HNNKFDSXY
