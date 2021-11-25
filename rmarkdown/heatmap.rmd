@@ -1,0 +1,328 @@
+---
+title: "Figures: heatmaps"
+author: "Cankun Wang"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(error = F)
+knitr::opts_chunk$set(fig.width = 8)
+
+library(Seurat)
+library(cowplot)
+library(ggplot2)
+library(patchwork)
+library(here)
+library(qs)
+library(Polychrome)
+library(RColorBrewer)
+library(tidyverse)
+library(ComplexHeatmap)
+library(data.table)
+library(circlize)
+library(RColorBrewer)
+library(GSVA)
+library(ggpubr)
+library(matrixStats)
+library(EnhancedVolcano)
+```
+
+
+# Set working dir
+
+```{r,,eval=T,message=F,warning=F,error=F}
+
+here::set_here()
+print(paste("Current working directory:", here::here()))
+
+```
+
+# Load data
+
+```{r}
+source("functions.R")
+dir.create('../sample_obj', showWarnings = F)
+combined <- qs::qread('combined.qsave')
+
+DefaultAssay(combined) <- "RNA"
+Idents(combined) <- combined$orig.ident
+
+sample_color <-
+  as.character(glasbey.colors()[-1])
+
+cell_type_color <-
+  as.character(palette36.colors(36)[-2])
+two_color <- c('#C0C0C0', '#B00D23')
+
+
+provided_marker <- read_csv("../marker/marker_by_day.csv") %>%
+  mutate(cell_type = factor(cell_type))
+
+provided_marker
+
+```
+
+
+# Setup
+
+```{r}
+all_ct <- levels(as.factor(combined$cell_type))
+all_cell_type_cols <- cell_type_color[1:length(all_ct)]
+names(all_cell_type_cols) <- all_ct
+
+all_samples <- levels(as.factor(combined$orig.ident))
+all_sample_cols <- sample_color[1:length(all_samples)]
+names(all_sample_cols) <- all_samples
+
+print(all_cell_type_cols)
+print(all_sample_cols)
+print(two_color)
+
+```
+
+```{r, include=F}
+
+```
+
+# Heat by sample
+
+```{r}
+
+#this_combined <- qs::qread("../integration/day30_harmony.qsave")
+this_combined <- combined
+
+DefaultAssay(this_combined) <- "RNA"
+
+this_combind <- ScaleData(this_combined, verbose = F)
+
+this_genes <- unique(provided_marker$gene)
+
+if (length(which(toupper(this_genes) == this_genes)) > length(this_genes) / 2) {
+  this_genes_index <-
+    which(toupper(rownames(counts)) %in% this_genes)
+} else {
+  this_genes_index <- which(rownames(counts) %in% this_genes)
+}
+
+
+mat <-
+  AverageExpression(this_combind, slot = "data")$RNA[this_genes_index, ]
+mat <- as.matrix(mat)
+
+#mat <- log1p(mat)
+mat <- (mat - as.numeric(rowMeans(mat))) / rowSds(mat)
+
+
+color_sequence <- seq(min(mat), max(mat), length = 3) / 1
+color_fun = colorRamp2(color_sequence, c("#3266AD", "white", "#B12424"), space = "RGB")
+
+col_fun <- all_sample_cols
+tmp_order <-
+  c("Con0",
+    "N1KO0",
+    "Con2",
+    "N1KO2",
+    "Con5",
+    "N1KO5",
+    "Con10",
+    "N1KO10",
+    "Con14",
+    "N1KO14",
+    "Con30",
+    "N1KO30")
+names(col_fun) <- tmp_order
+tmp_ident <- factor(this_combind$orig.ident, levels = tmp_order)
+
+#mat <- mat[, c(4, 2, 3, 1)]
+ht1 <- Heatmap(
+  mat,
+  top_annotation = HeatmapAnnotation(
+    Group = tmp_order,
+    col = list(Group = col_fun),
+    show_annotation_name = F
+  ),
+  show_column_names = T,
+  cluster_rows = T,
+  show_row_names = T,
+  row_km = NULL,
+  show_column_dend = F,
+  col = color_fun,
+  heatmap_legend_param = list(
+    title = "Relative\nexpression",
+    at = c(min(mat), 0,  max(mat)),
+    labels = c("low", "", "high")
+  ),
+  column_order = 1:ncol(mat),
+  column_names_rot = 30
+)
+
+
+
+ht1 <- Heatmap(
+  mat,
+  show_column_names = T,
+  cluster_rows = T,
+  show_row_names = T,
+  row_km = NULL,
+  show_column_dend = F,
+  col = color_fun,
+  heatmap_legend_param = list(
+    title = "Relative\nexpression",
+    at = c(min(mat), 0,  max(mat)),
+    labels = c("low", "", "high")
+  ),
+  column_order = 1:ncol(mat),
+  column_names_rot = 30
+)
+
+
+draw(ht1)
+```
+
+# Heat by CT
+
+```{r}
+
+#this_combined <- qs::qread("../integration/day30_harmony.qsave")
+this_combined <- combined
+
+DefaultAssay(this_combined) <- "RNA"
+
+this_combind <- ScaleData(this_combined, verbose = F)
+Idents(this_combind) <- this_combind$cell_type
+this_genes <- unique(provided_marker$gene)
+
+if (length(which(toupper(this_genes) == this_genes)) > length(this_genes) / 2) {
+  this_genes_index <-
+    which(toupper(rownames(counts)) %in% this_genes)
+} else {
+  this_genes_index <- which(rownames(counts) %in% this_genes)
+}
+
+
+mat <-
+  AverageExpression(this_combind, slot = "data")$RNA[this_genes_index, ]
+mat <- as.matrix(mat)
+
+#mat <- log1p(mat)
+mat <- (mat - as.numeric(rowMeans(mat))) / rowSds(mat)
+
+
+color_sequence <- seq(min(mat), max(mat), length = 3) / 1
+color_fun = colorRamp2(color_sequence, c("#3266AD", "white", "#B12424"), space = "RGB")
+
+#mat <- mat[, c(4, 2, 3, 1)]
+ht1 <- Heatmap(
+  mat,
+  top_annotation = HeatmapAnnotation(
+    Group = tmp_order,
+    col = list(Group = col_fun),
+    show_annotation_name = F
+  ),
+  show_column_names = T,
+  cluster_rows = T,
+  show_row_names = T,
+  row_km = NULL,
+  show_column_dend = F,
+  col = color_fun,
+  heatmap_legend_param = list(
+    title = "Relative\nexpression",
+    at = c(min(mat), 0,  max(mat)),
+    labels = c("low", "", "high")
+  ),
+  column_order = 1:ncol(mat),
+  column_names_rot = 30
+)
+
+
+
+ht1 <- Heatmap(
+  mat,
+  show_column_names = T,
+  cluster_rows = T,
+  show_row_names = T,
+  row_km = NULL,
+  show_column_dend = F,
+  col = color_fun,
+  heatmap_legend_param = list(
+    title = "Relative\nexpression",
+    at = c(min(mat), 0,  max(mat)),
+    labels = c("low", "", "high")
+  ),
+  column_order = 1:ncol(mat),
+  column_names_rot = 30
+)
+
+
+draw(ht1)
+```
+
+# Heat by CT+sample
+
+```{r}
+
+#this_combined <- qs::qread("../integration/day30_harmony.qsave")
+this_combined <- combined
+
+DefaultAssay(this_combined) <- "RNA"
+tmp_ident <- paste(this_combined$cell_type, this_combined$orig.ident,sep = "-")
+this_combind <- AddMetaData(this_combind, tmp_ident, "ct_sample")
+this_combind <- ScaleData(this_combined, verbose = F)
+Idents(this_combind) <- this_combind$ct_sample
+this_genes <- unique(provided_marker$gene)
+
+if (length(which(toupper(this_genes) == this_genes)) > length(this_genes) / 2) {
+  this_genes_index <-
+    which(toupper(rownames(counts)) %in% this_genes)
+} else {
+  this_genes_index <- which(rownames(counts) %in% this_genes)
+}
+
+
+mat <-
+  AverageExpression(this_combind, slot = "data")$RNA[this_genes_index, ]
+mat <- as.matrix(mat)
+
+#mat <- log1p(mat)
+mat <- (mat - as.numeric(rowMeans(mat))) / rowSds(mat)
+
+
+color_sequence <- seq(min(mat), max(mat), length = 3) / 2
+color_fun = colorRamp2(color_sequence, c("#3266AD", "white", "#B12424"), space = "RGB")
+
+#mat <- mat[, c(4, 2, 3, 1)]
+
+
+ht1 <- Heatmap(
+  mat,
+  show_column_names = T,
+  cluster_rows = T,
+  show_row_names = T,
+  row_km = NULL,
+  show_column_dend = F,
+  col = color_fun,
+  heatmap_legend_param = list(
+    title = "Relative\nexpression",
+    at = c(min(mat), 0,  max(mat)),
+    labels = c("low", "", "high")
+  ),
+  column_order = 1:ncol(mat),
+  column_names_rot = 45
+)
+
+png("../figure/heatmap/marker_ct_sample.png", width = 5500, height = 2000, res = 300)
+
+draw(ht1)
+dev.off()
+```
+

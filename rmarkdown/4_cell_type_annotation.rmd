@@ -50,7 +50,10 @@ combined <- qs::qread('combined.qsave')
 DefaultAssay(combined) <- "RNA"
 Idents(combined) <- combined$orig.ident
 
-custom_color <-
+sample_color <-
+  as.character(glasbey.colors()[-1])
+
+cell_type_color <-
   as.character(palette36.colors(36)[-2])
 two_color <- c('#C0C0C0', '#B00D23')
 
@@ -66,7 +69,7 @@ provided_marker
 DimPlot(
   combined,
   reduction = "umap",
-  cols = custom_color,
+  cols = cell_type_color,
   label = T,
   pt.size = 0.4,
   repel = T,
@@ -139,7 +142,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
+
 ```
   
 
@@ -208,7 +211,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
+
 ```
 
 
@@ -258,9 +261,8 @@ FeaturePlot(
   pt.size = 0.6,
   cols = two_color
 )
+
 #VlnPlot(this_combined, features = this_markers, ncol = 3)
-
-
 
 ```
 
@@ -292,9 +294,8 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("MIXL1"))
-print_violin(this_sample_name, genes = c("MIXL1"))
+
+
 ```
   
 
@@ -374,9 +375,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("MIXL1"))
-print_violin(this_sample_name, genes = c("MIXL1"))
+
 ```
 
 
@@ -462,9 +461,7 @@ DimPlot(this_combined, reduction = "umap")
 # Save
 qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("ISL1"))
-print_violin(this_sample_name, genes = c("ISL1"))
+
 ```
 
 ```{r, fig.width=10, fig.height = 12}
@@ -556,10 +553,7 @@ DimPlot(this_combined, reduction = "umap")
 # Save
 qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("ISL1"))
 
-print_violin(this_sample_name, genes = c("ISL1"))
 ```
 
 ```{r, fig.width=10, fig.height = 12}
@@ -572,9 +566,7 @@ VlnPlot(this_combined, features = unique(this_markers), ncol = 3)
 
 ## Con10
  
-Con10: Cardiac mesoderm, SHF progenitor, FHF progenitor, Epicardial progenitor, Atrial cardiomyocytes, Ventricular cardiomyocytes, Pacemaker cells, Vascular smooth muscle cells, Cardiac fibroblast
-
-and early cardiomyocytes
+Con10: Cardiac mesoderm, SHF progenitor, FHF progenitor, Epicardial progenitor, Atrial cardiomyocytes, Ventricular cardiomyocytes, Pacemaker cells, Vascular smooth muscle cells, Cardiac fibroblast, Early cardiomyocytes
 
 ```{r, fig.height = 6}
 # Settings
@@ -641,7 +633,7 @@ tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(9, 11, 14)] <- "FHF progenitor"
 tmp_levels[c(3, 5)] <- "SHF progenitor"
 tmp_levels[c(6)] <- "Epicardial progenitor"
-tmp_levels[c(1, 7, 8, 12, 13)] <- "Unidentified"
+tmp_levels[c(1, 7, 8, 12, 13)] <- "Unidentified (NR2F2+)"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -657,7 +649,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 #Con10
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
+
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -713,7 +705,9 @@ FeaturePlot(
   pt.size = 0.6,
   cols = two_color
 )
+
 #VlnPlot(this_combined, features = unique(this_markers), ncol = 3)
+
 ```
 
 
@@ -755,7 +749,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 #N1KO10
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
+
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -833,9 +827,8 @@ if (!file.exists(deg_filename)) {
 
 tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
-tmp_levels[c(15)] <- "Vascular smooth muscle cells"
 tmp_levels[c(1, 7, 9)] <- "Cardiac fibroblast"
-tmp_levels[c(3, 8, 13 )] <- "Unidentified"
+tmp_levels[c(3, 8, 11, 13 )] <- "Unidentified (NR2F2+)"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -849,8 +842,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("TNNT2", "DDR2"))
+
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -931,7 +923,6 @@ if (!file.exists(deg_filename)) {
 tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(5, 8, 12, 16)] <- "Cardiac fibroblast"
-tmp_levels[c(11, 15)] <- "Vascular smooth muscle cells"
 levels(tmp_ident) <- tmp_levels
 
 
@@ -948,8 +939,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("TNNT2", "DDR2"))
+
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -1032,7 +1022,6 @@ tmp_levels <- rep("Ventricular cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(4)] <- "Atrial cardiomyocytes"
 tmp_levels[c(11)] <- "Pacemaker cell"
 tmp_levels[c(12)] <- "Cardiac fibroblast"
-tmp_levels[c(14, 16)] <- "Vascular smooth muscle cells"
 
 levels(tmp_ident) <- tmp_levels
 
@@ -1049,8 +1038,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("TNNT2", "MYL2"))
+
 ```
 
 ```{r, fig.width=10, fig.height = 16}
@@ -1148,8 +1136,7 @@ qs::qsave(this_combined, paste0("../sample_obj/", this_sample_name, ".qsave"))
 
 table(this_combined$cell_type)
 table(this_combined$cell_type) / sum(as.numeric(table(this_combined$cell_type)))
-print_sample(this_sample_name)
-print_genes(this_sample_name, genes = c("TNNT2", "MYL2"))
+
 ```
 
 ```{r, fig.width=10, fig.height = 20}
@@ -1207,56 +1194,44 @@ combined <- AddMetaData(combined, tmp_ident, col.name = "condition")
 Idents(combined) <- combined$cell_type
 DimPlot(combined,
         reduction = "umap",
-        cols = custom_color,
+        cols = cell_type_color,
         pt.size = 0.8)
 
-#p1 <- DimPlot(
-#  combined,
-#  reduction = "umap",
-#  split.by = "orig.ident",
-#  cols = custom_color,
-#  pt.size = 0.6,
-#  ncol = 6
-#)
-#
-#
-#png(
-#  paste("umap_12.png",
-#        sep = ""),
-#  width = 6000,
-#  height = 1800,
-#  res = 300
-#)
-#print(p1)
-#dev.off()
 ```
 
 
-```{r fig.width=10, fig.height=8}
+```{r fig.width=10, fig.height=4}
+
 Idents(combined) <- combined$cell_type
 
 p1 <- DimPlot(
   combined,
   reduction = "umap",
   split.by = "condition",
-  cols = custom_color,
+  cols = cell_type_color,
   pt.size = 0.8,
   ncol = 6
 )
 
-png(
-  paste("umap_condition_cell_type.png",
-        sep = ""),
-  width = 4000,
-  height = 1800,
-  res = 300
-)
 print(p1)
-dev.off()
+
+```
 
 
-DimPlot(combined, reduction = "umap", cols = custom_color)
+```{r fig.width=10, fig.height=4}
 
+Idents(combined) <- combined$cell_type
+
+p1 <- DimPlot(
+  combined,
+  reduction = "umap",
+  split.by = "orig.ident",
+  cols = cell_type_color,
+  pt.size = 0.8,
+  ncol = 6
+)
+
+print(p1)
 
 ```
 
