@@ -633,7 +633,7 @@ tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(9, 11, 14)] <- "FHF progenitor"
 tmp_levels[c(3, 5)] <- "SHF progenitor"
 tmp_levels[c(6)] <- "Epicardial progenitor"
-tmp_levels[c(1, 7, 8, 12, 13)] <- "Unidentified (NR2F2+)"
+tmp_levels[c(1, 7, 8, 12, 13)] <- "Unidentified"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
@@ -828,7 +828,7 @@ if (!file.exists(deg_filename)) {
 tmp_ident <- as.factor(this_combined$seurat_clusters)
 tmp_levels <- rep("Early cardiomyocytes", length(levels(tmp_ident)))
 tmp_levels[c(1, 7, 9)] <- "Cardiac fibroblast"
-tmp_levels[c(3, 8, 11, 13 )] <- "Unidentified (NR2F2+)"
+tmp_levels[c(3, 8, 11, 13 )] <- "Unidentified"
 levels(tmp_ident) <- tmp_levels
 
 this_combined <-
