@@ -8,8 +8,10 @@ quiet <- function(x) {
   invisible(force(x))
 }
 # point size function from test datasets
-x <- c(0, 90, 124, 317, 1000, 2368, 3005, 4816, 8298, 50000, 500000, 5000000)
-y <- c(1, 1, 0.89, 0.33, 0.30, 0.25, 0.235, 0.205, 0.18, 0.1, 0.1, 0.1)
+x <-
+  c(0, 90, 124, 317, 1000, 2368, 3005, 4816, 8298, 50000, 500000, 5000000)
+y <-
+  c(1, 1, 0.89, 0.33, 0.30, 0.25, 0.235, 0.205, 0.18, 0.1, 0.1, 0.1)
 get_point_size <- approxfun(x, y)
 
 #########
@@ -55,20 +57,15 @@ enrichment_dotplot <-
         ylab("") +
         labs(size = "Overlapping count", color = "Adjusted p-value") +
         theme(
-          legend.title = element_text(size = 14,),
-          legend.text = element_text(size = 10,),
-          axis.text = element_text(size = 14),
-          axis.title = element_text(size = 14)
+          legend.title = element_text(size = 18,),
+          legend.text = element_text(size = 14,),
+          axis.text = element_text(size = 18),
+          axis.title = element_text(size = 18)
         ) +
         scale_x_continuous(name = "Overlapping ratio") +
-        scale_size(range = c(6, 14))
+        scale_size(range = c(8, 16))
       
-      png(filename,
-          width = width,
-          height = height,
-          res = 300)
-      print(p1)
-      dev.off()
+      return(p1)
     }
   }
 
@@ -129,3 +126,44 @@ read.loom.matrices <- function(file, engine = 'hdf5r') {
 }
 
 
+
+print_enrich <- function() {
+  cts_markers <- read.csv(paste0(this_dir, this_file))
+  this_base <- tools::file_path_sans_ext(this_file)
+  this_up <- cts_markers %>%
+    filter(avg_log2FC > 0) %>%
+    pull(gene)
+  this_down <- cts_markers %>%
+    filter(avg_log2FC < 0) %>%
+    pull(gene)
+  
+  # Up
+  enriched_combined <- enrichr(this_up, dbs)
+  this_terms <- enriched_combined$GO_Biological_Process_2018
+  this_selected_terms <-
+    enriched_combined$GO_Biological_Process_2018 %>%
+    dplyr::filter(str_detect(Term, paste(this_up_terms, collapse = "|")))
+  
+  print(this_selected_terms)
+  pdf(
+    paste0("../figure/", this_day, "_up_", this_base, ".pdf"),
+    width = 12,
+    height = 7
+  )
+  print(enrichment_dotplot(this_selected_terms))
+  dev.off()
+  
+  # Down
+  enriched_combined <- enrichr(this_down, dbs)
+  this_selected_terms <-
+    enriched_combined$GO_Biological_Process_2018 %>%
+    dplyr::filter(str_detect(Term, paste(this_down_terms, collapse = "|")))
+  print(this_selected_terms)
+  pdf(
+    paste0("../figure/", this_day, "_down_", this_base, ".pdf"),
+    width = 12,
+    height = 7
+  )
+  print(enrichment_dotplot(this_selected_terms))
+  dev.off()
+}

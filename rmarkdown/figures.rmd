@@ -127,6 +127,7 @@ print_pie <- function(this_sample_name = "Con2") {
   pie_df <- table(as.factor(this_combined$cell_type))
   pct <- round(100 * pie_df / sum(pie_df))
   
+  this_cols <- this_cols[names(pct)]
   pdf(paste0("../figure/pie_",this_sample_name,".pdf"), width = 8, height = 5)
   print(pie(pie_df,
             labels = paste(sep = " ", pct, "%"),
@@ -238,7 +239,7 @@ print_violin_day <-
 
 ```{r}
 this_samples <- levels(as.factor(combined$orig.ident))
-i <- this_samples[1]
+i <- this_samples[4]
 for(i in this_samples) {
   this_sample_path <- paste0("../sample_obj/",i,".qsave")
   this_combined <- qs::qread(this_sample_path)
