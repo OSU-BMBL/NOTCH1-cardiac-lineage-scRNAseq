@@ -64,10 +64,36 @@ provided_marker <- read_csv("../marker/marker_by_day.csv") %>%
 provided_marker
 
 t1 = data.frame(v1=levels(as.factor(combined$cell_type)), v2=cell_type_color[1:14])
+
+Idents(combined)
+
+tmp_ident <- as.factor(combined$orig.ident)
+
+levels(tmp_ident) <-
+  c(
+    "WT D0",
+    "WT D2",
+    "WT D5",
+    "WT D10",
+    "WT D14",
+    "WT D30",
+    "N1KO D0",
+    "N1KO D2",
+    "N1KO D5",
+    "N1KO D10",
+    "N1KO D14",
+    "N1KO D30"
+  )
+
+combined <- AddMetaData(combined, tmp_ident, col.name = "sample")
+
+#qs::qsave(combined, "combined.qsave")
+
 ```
 
 
 ```{r, fig.width=10, fig.height=8}
+Idents(combined) <- combined$sample
 
 p1 <- DimPlot(
   combined,

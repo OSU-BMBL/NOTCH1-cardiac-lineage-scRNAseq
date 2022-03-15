@@ -65,70 +65,7 @@ sample_list <- read.csv("../sample_list.csv")
 sample_list
 ```
 
-
-
-```{r, results=F, message=F}
-i = 1
-for (i in seq_len(nrow(sample_list))) {
-  
-  this_sample <- sample_list$sample[i]
-  this_sample_name <- sample_list$id[i]
-  this_day <- sample_list$day[i]
-  #sub_combined <- subset(combined, idents = this_sample)
-  
-  sub_combined <- qread(paste0("../sample_obj/",this_sample,".qsave"))
-  loom_filename <-
-    paste0("../velocity_loom/", this_sample_name, ".loom")
-  loom_obj <- read.loom.matrices(file = loom_filename)
-  loom_seurat_obj <- as.Seurat(x = loom_obj)
-  
-  # Rename cell names in velocity matrix
-  col_velo <-
-    str_split_fixed(colnames(loom_seurat_obj), ":", 2)[, 2]
-  col_velo <- str_replace_all(col_velo, "x", "-1")
-  col_velo <- paste0(this_sample, "_", col_velo)
-  
-  velo_cell_exist_in_RNA <-
-    which(col_velo %in% colnames(sub_combined))
-  
-  col_velo <- col_velo[velo_cell_exist_in_RNA]
-  
-  loom_obj$spliced <- loom_obj$spliced[, velo_cell_exist_in_RNA]
-  loom_obj$unspliced <- loom_obj$unspliced[, velo_cell_exist_in_RNA]
-  loom_obj$ambiguous <- loom_obj$ambiguous[, velo_cell_exist_in_RNA]
-  
-  loom_obj$spliced <- loom_obj$spliced[, order(col_velo)]
-  loom_obj$unspliced <- loom_obj$unspliced[, order(col_velo)]
-  loom_obj$ambiguous <- loom_obj$ambiguous[, order(col_velo)]
-  col_velo <- col_velo[order(col_velo)]
-  
-  bm <- as.Seurat(x = loom_obj)
-  bm <- RenameCells(bm, new.names = col_velo)
-  
-  bm[["RNA"]] <- bm[["spliced"]]
-  #DefaultAssay(bm) <- "RNA"
-  bm <- SCTransform(bm, verbose = F)
-  bm <- ScaleData(bm, verbose = F)
-  bm <- RunPCA(bm, verbose = F)
-  bm <- RunUMAP(bm, dims = 1:20, verbose = F)
-  bm <- FindNeighbors(bm, dims = 1:20, verbose = F)
-  #bm <- FindClusters(bm, resolution = 0.2)
-  DefaultAssay(bm) <- "RNA"
-  
-  # Use original UMAP corrdinates
-  
-  bm@reductions$umap@cell.embeddings <-
-    sub_combined@reductions$umap@cell.embeddings
-  bm@meta.data <- cbind(bm@meta.data, sub_combined@meta.data)
-  qs::qsave(bm, paste0(RESULT_DIR, this_sample, "_velo.qsave"))
-  SaveH5Seurat(bm, filename = paste0(RESULT_DIR, this_sample, ".h5Seurat"))
-  Convert(paste0(RESULT_DIR, this_sample, ".h5Seurat"), dest = "h5ad")
-}
-
-```
-
-
-# Extract on integrated UMAP
+# Extract velocity counts
 
 ```{r}
 i = 1
@@ -138,9 +75,7 @@ for (i in seq_len(nrow(sample_list))) {
   this_sample_name <- sample_list$id[i]
   this_day <- sample_list$day[i]
   
-  #sub_combined <- subset(combined, idents = this_sample)
-  
-  sub_combined <- qread(paste0("../integration/day",this_day,"_harmony.qsave"))
+  sub_combined <- subset(combined, idents = this_sample)
   
   loom_filename <-
     paste0("../velocity_loom/", this_sample_name, ".loom")
@@ -171,19 +106,8 @@ for (i in seq_len(nrow(sample_list))) {
   bm <- RenameCells(bm, new.names = col_velo)
   
   bm[["RNA"]] <- bm[["spliced"]]
-  #DefaultAssay(bm) <- "RNA"
-  bm <- SCTransform(bm)
-  bm <- ScaleData(bm)
-  bm <- RunPCA(bm)
-  bm <- RunUMAP(bm, dims = 1:20)
-  bm <- FindNeighbors(bm, dims = 1:20)
-  #bm <- FindClusters(bm, resolution = 0.2)
   DefaultAssay(bm) <- "RNA"
   
-  # Use original UMAP corrdinates
-  sub_combined <- subset(sub_combined, cells = colnames(bm))
-  bm@reductions$umap@cell.embeddings <-
-    sub_combined@reductions$umap@cell.embeddings
   bm@meta.data <- cbind(bm@meta.data, sub_combined@meta.data)
   qs::qsave(bm, paste0(RESULT_DIR, this_sample, "_velo.qsave"))
   SaveH5Seurat(bm, filename = paste0(RESULT_DIR, this_sample, ".h5Seurat"))
@@ -193,8 +117,7 @@ for (i in seq_len(nrow(sample_list))) {
 
 ```
 
-# Extract on combined samples
-
+# Convert to AnnData format for scVelo
 
 ```{r}
 
@@ -210,7 +133,6 @@ obj9 <- qread("../velocity_h5ad/N1KO5_velo.qsave")
 obj10 <- qread("../velocity_h5ad/N1KO10_velo.qsave")
 obj11 <- qread("../velocity_h5ad/N1KO14_velo.qsave")
 obj12 <- qread("../velocity_h5ad/N1KO30_velo.qsave")
-
 
 obj <-
   merge(
@@ -228,71 +150,34 @@ obj <-
           obj12)
   )
 
-obj <- AddMetaData(obj, combined$cell_type, col.name = "cell_type")
+# Rename to singular noun
+tmp_idents <- as.factor(obj$cell_type)
+levels(tmp_idents) <-
+  c(
+    "Atrial cardiomyocyte",
+    "Cardiac fibroblast",
+    "Cardiac mesoderm",
+    "Differentiating iPSC",
+    "Early cardiomyocyte",
+    "Epicardial progenitor",
+    "FHF progenitor",
+    "iPSC",
+    "Mesoderm",
+    "Pacemaker cell",
+    "SHF progenitor",
+    "Unidentified",
+    "Vascular smooth muscle cell",
+    "Ventricular cardiomyocyte"
+  )
 
-obj@reductions$umap <-
-    combined@reductions$umap
+obj@meta.data$cell_type <- as.character(tmp_idents)
+
 qs::qsave(obj, paste0(RESULT_DIR, "all_velo.qsave"))
+RESULT_DIR <- "../velocity_h5ad/"
+
 SaveH5Seurat(obj, filename = paste0(RESULT_DIR, "all.h5Seurat"))
 Convert(paste0(RESULT_DIR, "all.h5Seurat"), dest = "h5ad")
 
-
-
 ```
-
-# Plots
-
-```{r}
-
-
-bm@reductions$umap@cell.embeddings <- sub_combined@reductions$umap@cell.embeddings
-bm@meta.data <- cbind(bm@meta.data, sub_combined@meta.data)
-SaveH5Seurat(bm, filename = paste0(this_sample, ".h5Seurat"))
-Convert(paste0(this_sample, ".h5Seurat"), dest = "h5ad")
-colnames(bm@meta.data)
-
-
-for (i in seq_along(provided_marker$gene)) {
-    this_gene <- provided_marker$gene[i]
-    this_ct <- as.character(provided_marker$cell_type[i])
-    p1 <-
-      FeaturePlot(bm,
-                  this_gene,
-                  pt.size = 0.4,
-                  cols = two_color,
-                  reduction = "umap",
-                  keep.scale = "all")
-    
-    png(
-      paste(
-        "./result/velocity/",this_sample,"_",
-        this_gene,
-        "_",
-        this_ct,
-        "_velocity.png",
-        sep = ""
-      ),
-      width = 2000,
-      height = 1800,
-      res = 300
-    )
-    print(p1)
-    dev.off()
-  }
-
-```
-
-# Export to AnnData
-
-
-```{r,echo=F,eval=F,message=FALSE,warning=F}
-DefaultAssay(sub_combined) <- "integrated"
-transfer.anchors <- FindTransferAnchors(reference = sub_combined, query = bm, features = VariableFeatures(object = sub_combined),
-    reference.assay = "RNA", query.assay = "spliced", reduction = "cca")
-
-```
-
-
-
 
 

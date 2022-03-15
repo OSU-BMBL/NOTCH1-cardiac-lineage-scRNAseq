@@ -49,13 +49,13 @@ enrichment_dotplot <-
       p1 <- ggplot(new_df,
                    aes(x = gene_ratio,
                        y = Term)) +
-        geom_point(aes(size = len, color = Adjusted.P.value)) +
-        scale_color_gradient(low = "blue",
-                             high = "red",
+        geom_point(aes(size = len, color = pval)) +
+        scale_color_gradient(low = "red",
+                             high = "blue",
                              trans = 'reverse') +
         theme_bw() +
         ylab("") +
-        labs(size = "Overlapping count", color = "Adjusted p-value") +
+        labs(size = "Overlapping count", color = "-log10(adj.p)") +
         theme(
           legend.title = element_text(size = 18,),
           legend.text = element_text(size = 14,),

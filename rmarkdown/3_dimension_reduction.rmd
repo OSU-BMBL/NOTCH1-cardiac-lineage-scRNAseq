@@ -46,9 +46,7 @@ custom_color <-
 
 # Dimension reduction
 
-Here we only want to visualize the sample differences in one UMAP. The batch removal is actually not needed as the cell types are defined by checking provided marker geners at each cell, the seurat clusters won't be used for downstream analysis.
-
-We adjusted UMAP neighbors and distance paramsters to make the visualization more 'spread'.
+Here we only want to visualize the sample differences in one UMAP. We adjusted UMAP neighbors and distance paramsters to make the visualization more 'spread'.
 
 ```{r,echo=F,eval=T,message=F,warning=F,error=F}
 

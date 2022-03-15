@@ -116,7 +116,7 @@ for (day in days) {
 
 ```{r,echo=F,eval=F,message=FALSE,warning=F}
 
-this_sample_name <- "Con14"
+this_sample_name <- "N1KO30"
 
 for (this_sample_name in levels(combined$orig.ident)) {
   Idents(combined) <- combined$orig.ident
@@ -338,6 +338,7 @@ heat_obj <-
 Idents(heat_obj) <- as.factor(heat_obj$tmp_ct)
 
 ```
+
 ## Top 5 degs
 
 ```{r}
