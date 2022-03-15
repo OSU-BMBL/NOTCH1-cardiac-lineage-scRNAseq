@@ -1,4 +1,4 @@
-# NOTCH1-scRNAseq
+# NOTCH1-cardiac-lineage-scRNAseq
 
 This is the repository for the manuscript: to-be-added.
 
