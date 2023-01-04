@@ -16,7 +16,7 @@ If you have any questions or feedback regarding this repository, please contact 
 
 ## Download data (working in progress)
 
-- Processed count matrix and metadata for cells: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE196632 (Supplementary file section)
+- Merged count matrix and metadata for cells: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE196632 (Supplementary file section)
 - Count matrices generated from CellRanger 
 - RNA velocity matrices
 - Raw FASTQ reads: https://www.ncbi.nlm.nih.gov/bioproject/PRJNA806200
