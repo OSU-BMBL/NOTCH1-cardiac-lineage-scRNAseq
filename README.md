@@ -16,6 +16,13 @@ Note: raw data is not added due to paper revision
 - rmarkdown: analysis code in R from 10x read counts 
 - jupyter: RNA velocity analysis in Python
 
+## Download data (working in progress)
+
+- Processed count matrix and metadata for cells
+- Count matrices generated from CellRanger
+- RNA velocity matrices
+- Raw FASTQ reads
+
 ## Author
 
 - [Cankun Wang](https://github.com/Wang-Cankun)
