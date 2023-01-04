@@ -1,6 +1,6 @@
 # NOTCH1-cardiac-lineage-scRNAseq
 
-This is the repository for the manuscript: Single-cell transcriptomics reveals impaired human cardiac cell lineage determination and cardiomyocyte proliferation due to NOTCH1 deficiency.
+This is the repository for the manuscript: [Impaired Human Cardiac Cell Development due to NOTCH1 Deficiency](https://www.ahajournals.org/doi/10.1161/CIRCRESAHA.122.321398).
 
 If you have any questions or feedback regarding this notebook, please contact Cankun Wang via <cankun.wang@osumc.edu>.
 
