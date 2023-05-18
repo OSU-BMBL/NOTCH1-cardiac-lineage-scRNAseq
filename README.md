@@ -17,6 +17,7 @@ If you have any questions or feedback regarding this repository, please contact 
 ## Download data
 
 - Merged count matrix and metadata for cells: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE196632 (Supplementary file section)
+- Processed Seurat object: https://bmblx.bmi.osumc.edu/downloadFiles/NOTCH1/NOTCH1_seurat_obj.rds
 - Count matrices generated from CellRanger: https://bmblx.bmi.osumc.edu/downloadFiles/NOTCH1/NOTCH1_scRNAseq_10x_counts.zip
 - RNA velocity matrices: https://bmblx.bmi.osumc.edu/downloadFiles/NOTCH1/NOTCH1_velocity_loom.zip
 - Raw FASTQ reads: https://www.ncbi.nlm.nih.gov/bioproject/PRJNA806200
